@@ -7,10 +7,10 @@
 // REVIRION HISTORY
 //   06/26/2021 : Create.
 //=============================================================================
-#include<header.h>
+#include"header.h"
 
 
-void subfunc::printsomthing(void);
+void subfunc::printsomthing(void)
 {
     std::cout<<"Test For me...!"<<std::endl;
 }

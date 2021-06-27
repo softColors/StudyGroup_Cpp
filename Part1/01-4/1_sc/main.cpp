@@ -7,9 +7,9 @@
 // REVIRION HISTORY
 //   06/26/2021 : Create.
 //=============================================================================
-#include<header.h>
+#include"header.h"
 
 int main(void)
 {
-    subfunc::printsomthing(void);
+    subfunc::printsomthing();
 }
