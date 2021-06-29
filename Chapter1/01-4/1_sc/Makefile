@@ -1,5 +1,5 @@
 #==============================================================================
-#  FILE NAME  : Part1/01-4/Makefile
+#  FILE NAME  : Chapter1/01-4/Makefile
 #  DESCRIPTS  : study c++ programing
 #  PROGRAMMER : softColors
 # -----------------------------------------------------------------------------
