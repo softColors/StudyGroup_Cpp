@@ -1,11 +1,11 @@
 
 //=============================================================================
-// FILE NAME  : Chapter7/07-5_OOP_PROJECT/OOP_project.cpp
+// FILE NAME  : Chapter8/08-4_OOP_PROJECT/OOP_project.cpp
 // DESCRIPTS  : study c++ programing
 // PROGRAMMER : softColors
 //-----------------------------------------------------------------------------
 // REVIRION HISTORY
-//   07/09/2021 : Create.
+//   07/10/2021 : Create.
 //=============================================================================
 #include<iostream>
 #include<cstring>
@@ -19,6 +19,8 @@ using namespace std;
 #define FALSE 0
 
 enum{OPEN=1, DEPOSIT, WITHDRAW, INQUIRY, END};
+enum{NOMAL_ACC=1, HIGH_CREDIT_ACC =2};
+namespace CREDIT_TYPE{ enum{TYPE_A=7, TYPE_B =4, TYPE_C = 2}; }
 
 // ============================================================================
 
@@ -31,7 +33,7 @@ private:
 
 public:
 
-    Account(char *name,int id, int balance)
+    Account(char *name,int id, int balance) 
     {
         this->name = new char[strlen(name)+1];
         strcpy(this->name,name);
@@ -43,17 +45,16 @@ public:
         name = new char [strlen(ref.name)+1];
         strcpy(name, ref.name);
     }
-    ~Account()
+    virtual ~Account()
     {
         delete []name; 
     }
 
     int ResponceID(void) const {  return id;   } 
 
-    int Deposit(int deposit_money)
+    virtual void Deposit(int deposit_money)
     {
         balance += deposit_money;
-        return balance;
     }
 
     int Withdraw(int withdraw_money)
@@ -71,6 +72,44 @@ public:
     }
 
 };
+
+
+class NomalAccount : public Account
+{
+private:
+    int interest ;
+
+public:
+    NomalAccount(char *name,int id, int balance,int value) 
+       : Account(name,id,balance), interest(value)  {}
+
+  
+    virtual void Deposit(int deposit_money)
+    {
+        Account::Deposit(deposit_money);
+        Account::Deposit((int)deposit_money*(interest/100.0));
+    }
+
+};
+
+class HighCreditAccount : public NomalAccount
+{
+private:
+    int credit_type;
+
+public:
+    HighCreditAccount(char *name,int id, int balance,int value,int type) 
+       : NomalAccount(name,id,balance,value), credit_type(type)
+       {}
+
+    virtual void Deposit(int deposit_money)
+    {
+        NomalAccount::Deposit(deposit_money);
+        NomalAccount::Deposit((int)deposit_money*(credit_type/100.0));
+    }
+};
+
+
 
 
 class AccountHandler
@@ -102,18 +141,71 @@ public:
         return select;
     }
 
-    void OpenAccount(void)
-    {   
+    void OpenAccount_NomalAcc(void)
+    {
         int id;
         char name[MAX_NAME_LEN];
         int balance;
-        cout<<"[Open Account]"<<endl;
+        int interest_rate;
+
+        cout<<"[Open Nomal Account]"<<endl;
         cout<<"Account ID   : "; cin>>id;
         cout<<"Name         : "; cin>>name;
         cout<<"Deposit money: "; cin>>balance;
-        Acc[current_accNum] = new Account(name,id,balance);
+        cout<<"interest rate: "; cin>>interest_rate;
 
-        current_accNum++;
+        Acc[current_accNum] = new NomalAccount(name,id,balance,interest_rate);
+    }
+
+    void OpenAccount_NomalHighCredit(void)
+    {
+        int id;
+        char name[MAX_NAME_LEN];
+        int balance;
+        int interest_rate;
+        int credit_type;
+        cout<<"[Open High Credit Account]"<<endl;
+        cout<<"Account ID   : "; cin>>id;
+        cout<<"Name         : "; cin>>name;
+        cout<<"Deposit money: "; cin>>balance;
+        cout<<"interest rate: "; cin>>interest_rate;
+        cout<<"Credit Type[1toA, 2toB, 3toC]: "; cin>>credit_type;
+        switch (credit_type)
+        {
+        case 1:
+            Acc[current_accNum] = new HighCreditAccount(name,id,balance,interest_rate,CREDIT_TYPE::TYPE_A);
+            break;
+        case 2:
+            Acc[current_accNum] = new HighCreditAccount(name,id,balance,interest_rate,CREDIT_TYPE::TYPE_B);
+            break;
+
+        case 3:
+            Acc[current_accNum] = new HighCreditAccount(name,id,balance,interest_rate,CREDIT_TYPE::TYPE_C);
+            break;        
+        default:
+            cout<<"[ERROR] Wrong Credit Type"<<endl;
+            break;
+        }
+    }
+
+    void OpenAccount(int type)
+    {   
+        switch (type)
+        {
+        case NOMAL_ACC:
+            OpenAccount_NomalAcc();
+            current_accNum++;
+            break;
+
+        case HIGH_CREDIT_ACC:
+            OpenAccount_NomalHighCredit();
+            current_accNum++;
+            break;        
+
+        default:
+            cout<<"[ERROR] WRONG Num "<<endl;
+            break;
+        }
     }
 
     int SearchAccountID(int account_id)
@@ -199,7 +291,10 @@ int main(void)
         switch(select)
         {
             case OPEN: 
-                 Handler.OpenAccount();
+                cout<<"[Choose Account Type]"<<endl;
+                cout<<NOMAL_ACC<<". Nomal Account"<<endl;
+                cout<<HIGH_CREDIT_ACC<<". High Credit Account"<<endl;
+                Handler.OpenAccount(Handler.customerChoice());
             break;
             case DEPOSIT: 
                  Handler.DepositAccount();
@@ -214,6 +309,7 @@ int main(void)
                 Handler.CloseProgram();
                 cout<<"End!";
                 return 0;
+            
         }
     }
 }
